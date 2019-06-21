@@ -2,9 +2,13 @@
 extern crate bitflags;
 
 use e2p_sys::*;
+use nix;
+use std::ffi::CString;
+use std::path::Path;
 
 bitflags! {
     pub struct Flags: u32 {
+        const NONE = 0;
         const SECRM = EXT2_SECRM_FL;
         const UNRM = EXT2_UNRM_FL;
         const COMPR = EXT2_COMPR_FL;
@@ -41,13 +45,28 @@ bitflags! {
     }
 }
 
+pub fn lsattr(path: &Path) -> Result<Flags, nix::Error> {
+    let path_cstr = CString::new(path.to_str().expect("Could not convert Path to str"))
+        .expect("Could not convert str to CStr");
+    let ret: i32;
+    let mut retflags: u64 = 0;
+    let path_ptr = path_cstr.as_ptr();
+    let retflags_ptr: *mut u64 = &mut retflags;
+
+    unsafe {
+        ret = fgetflags(path_ptr, retflags_ptr);
+    }
+
+    match ret {
+        0 => Ok(Flags::from_bits(retflags as u32)
+                .expect("Failed to interpret return value as fileflag")
+            ),
+        _ => Err(nix::Error::last())
+    }
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn it_works() {
-        println!("{:x}", Flags::NOATIME);
-    }
 }
