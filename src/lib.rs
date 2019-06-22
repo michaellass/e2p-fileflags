@@ -9,6 +9,7 @@ use std::os::unix::io::AsRawFd;
 use std::path::Path;
 
 bitflags! {
+    #[derive(Default)]
     pub struct Flags: u32 {
         const SECRM = EXT2_SECRM_FL;
         const UNRM = EXT2_UNRM_FL;
