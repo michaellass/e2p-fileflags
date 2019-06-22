@@ -1,6 +1,10 @@
 #[macro_use]
 extern crate bitflags;
 
+#[cfg(feature = "serde")]
+#[macro_use]
+extern crate serde;
+
 use e2p_sys::*;
 use nix;
 use std::ffi::CString;
@@ -10,6 +14,7 @@ use std::path::Path;
 
 bitflags! {
     #[derive(Default)]
+    #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
     pub struct Flags: u32 {
         const SECRM = EXT2_SECRM_FL;
         const UNRM = EXT2_UNRM_FL;
