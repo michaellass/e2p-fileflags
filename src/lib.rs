@@ -5,6 +5,8 @@ use e2p_sys::*;
 use nix;
 use std::ffi::CString;
 use std::path::Path;
+use std::fs::File;
+use std::os::unix::io::AsRawFd;
 
 bitflags! {
     pub struct Flags: u32 {
@@ -45,16 +47,33 @@ bitflags! {
     }
 }
 
-pub fn lsattr(path: &Path) -> Result<Flags, nix::Error> {
-    let path_cstr = CString::new(path.to_str().expect("Could not convert Path to str"))
-        .expect("Could not convert str to CStr");
+// pub fn lsattr(path: &Path) -> Result<Flags, nix::Error> {
+//     let path_cstr = CString::new(path.to_str().expect("Could not convert Path to str"))
+//         .expect("Could not convert str to CStr");
+//     let ret: i32;
+//     let mut retflags: u64 = 0;
+//     let path_ptr = path_cstr.as_ptr();
+//     let retflags_ptr: *mut u64 = &mut retflags;
+//
+//     unsafe {
+//         ret = fgetflags(path_ptr, retflags_ptr);
+//     }
+//
+//     match ret {
+//         0 => Ok(Flags::from_bits(retflags as u32)
+//                 .expect("Failed to interpret return value as fileflag")
+//             ),
+//         _ => Err(nix::Error::last())
+//     }
+// }
+
+pub fn lsattr(f: &File) -> Result<Flags, nix::Error> {
     let ret: i32;
     let mut retflags: u64 = 0;
-    let path_ptr = path_cstr.as_ptr();
     let retflags_ptr: *mut u64 = &mut retflags;
 
     unsafe {
-        ret = fgetflags(path_ptr, retflags_ptr);
+        ret = getflags(f.as_raw_fd(), retflags_ptr);
     }
 
     match ret {
