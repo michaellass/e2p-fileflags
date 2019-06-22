@@ -156,3 +156,40 @@ impl FileFlags for File {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::env;
+    use std::fs::{remove_file, File};
+
+    #[test]
+    fn unified() {
+        let mut p = env::current_dir().expect("Could not determine current dir");
+        p.push("fileflags-testfile-voo4JooY");
+        let f = File::create(&p).expect("Could not create testfile");
+
+        assert_eq!(f.flags().unwrap(), Flags::empty());
+        p.set_flags(Flags::NOCOW).unwrap();
+        assert_eq!(f.flags().unwrap(), Flags::NOCOW);
+        p.set_flags(Flags::NOCOW | Flags::NOATIME).unwrap();
+        assert_eq!(f.flags().unwrap(), Flags::NOATIME | Flags::NOCOW);
+        p.set_flags(&Flags::NOCOW).unwrap();
+        assert_eq!(f.flags().unwrap(), Flags::NOCOW);
+        p.set_flags(&Flags::empty()).unwrap();
+        assert_eq!(f.flags().unwrap(), Flags::empty());
+
+        assert_eq!(p.flags().unwrap(), Flags::empty());
+        f.set_flags(Flags::NOCOW).unwrap();
+        assert_eq!(p.flags().unwrap(), Flags::NOCOW);
+        f.set_flags(Flags::NOCOW | Flags::NOATIME).unwrap();
+        assert_eq!(p.flags().unwrap(), Flags::NOATIME | Flags::NOCOW);
+        f.set_flags(&Flags::NOCOW).unwrap();
+        assert_eq!(p.flags().unwrap(), Flags::NOCOW);
+        f.set_flags(&Flags::empty()).unwrap();
+        assert_eq!(p.flags().unwrap(), Flags::empty());
+
+        drop(f);
+        let _ = remove_file(p);
+    }
+}
