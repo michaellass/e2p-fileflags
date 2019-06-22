@@ -46,12 +46,14 @@ bitflags! {
     }
 }
 
-pub trait FileAttrs {
+pub trait FileFlags {
     fn flags(&self) -> Result<Flags, nix::Error>;
-    fn setflags(&self, f: &Flags) -> Result<(), nix::Error>;
+    fn set_flags(&self, f: &Flags) -> Result<(), nix::Error>;
+    // fn add_flags(&self, f: &Flags) -> Result<(), nix::Error>;
+    // fn remove_flags(&self, f: &Flags) -> Result<(), nix::Error>;
 }
 
-impl FileAttrs for Path {
+impl FileFlags for Path {
     fn flags(&self) -> Result<Flags, nix::Error> {
         let path_cstr = CString::new(self.to_str().expect("Could not convert Path to str"))
             .expect("Could not convert str to CStr");
@@ -71,7 +73,7 @@ impl FileAttrs for Path {
         }
     }
 
-    fn setflags(&self, f: &Flags) -> Result<(), nix::Error> {
+    fn set_flags(&self, f: &Flags) -> Result<(), nix::Error> {
         let path_cstr = CString::new(self.to_str().expect("Could not convert Path to str"))
             .expect("Could not convert str to CStr");
         let ret: i32;
@@ -89,7 +91,7 @@ impl FileAttrs for Path {
     }
 }
 
-impl FileAttrs for File {
+impl FileFlags for File {
     fn flags(&self) -> Result<Flags, nix::Error> {
         let ret: i32;
         let mut retflags: u64 = 0;
@@ -106,7 +108,7 @@ impl FileAttrs for File {
         }
     }
 
-    fn setflags(&self, f: &Flags) -> Result<(), nix::Error> {
+    fn set_flags(&self, f: &Flags) -> Result<(), nix::Error> {
         let ret: i32;
         let intflags: u64 = f.bits() as u64;
 
