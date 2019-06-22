@@ -47,40 +47,48 @@ bitflags! {
     }
 }
 
-// pub fn lsattr(path: &Path) -> Result<Flags, nix::Error> {
-//     let path_cstr = CString::new(path.to_str().expect("Could not convert Path to str"))
-//         .expect("Could not convert str to CStr");
-//     let ret: i32;
-//     let mut retflags: u64 = 0;
-//     let path_ptr = path_cstr.as_ptr();
-//     let retflags_ptr: *mut u64 = &mut retflags;
-//
-//     unsafe {
-//         ret = fgetflags(path_ptr, retflags_ptr);
-//     }
-//
-//     match ret {
-//         0 => Ok(Flags::from_bits(retflags as u32)
-//                 .expect("Failed to interpret return value as fileflag")
-//             ),
-//         _ => Err(nix::Error::last())
-//     }
-// }
+trait FileAttrs {
+    fn lsattr(&self) -> Result<Flags, nix::Error>;
+}
 
-pub fn lsattr(f: &File) -> Result<Flags, nix::Error> {
-    let ret: i32;
-    let mut retflags: u64 = 0;
-    let retflags_ptr: *mut u64 = &mut retflags;
+impl FileAttrs for Path {
+    fn lsattr(&self) -> Result<Flags, nix::Error> {
+        let path_cstr = CString::new(self.to_str().expect("Could not convert Path to str"))
+            .expect("Could not convert str to CStr");
+        let ret: i32;
+        let mut retflags: u64 = 0;
+        let path_ptr = path_cstr.as_ptr();
+        let retflags_ptr: *mut u64 = &mut retflags;
 
-    unsafe {
-        ret = getflags(f.as_raw_fd(), retflags_ptr);
+        unsafe {
+            ret = fgetflags(path_ptr, retflags_ptr);
+        }
+
+        match ret {
+            0 => Ok(Flags::from_bits(retflags as u32)
+                    .expect("Failed to interpret return value as fileflag")
+                ),
+            _ => Err(nix::Error::last())
+        }
     }
+}
 
-    match ret {
-        0 => Ok(Flags::from_bits(retflags as u32)
-                .expect("Failed to interpret return value as fileflag")
-            ),
-        _ => Err(nix::Error::last())
+impl FileAttrs for File {
+    fn lsattr(&self) -> Result<Flags, nix::Error> {
+        let ret: i32;
+        let mut retflags: u64 = 0;
+        let retflags_ptr: *mut u64 = &mut retflags;
+
+        unsafe {
+            ret = getflags(self.as_raw_fd(), retflags_ptr);
+        }
+
+        match ret {
+            0 => Ok(Flags::from_bits(retflags as u32)
+                    .expect("Failed to interpret return value as fileflag")
+                ),
+            _ => Err(nix::Error::last())
+        }
     }
 }
 
