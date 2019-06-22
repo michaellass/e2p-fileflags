@@ -4,13 +4,12 @@ extern crate bitflags;
 use e2p_sys::*;
 use nix;
 use std::ffi::CString;
-use std::path::Path;
 use std::fs::File;
 use std::os::unix::io::AsRawFd;
+use std::path::Path;
 
 bitflags! {
     pub struct Flags: u32 {
-        const NONE = 0;
         const SECRM = EXT2_SECRM_FL;
         const UNRM = EXT2_UNRM_FL;
         const COMPR = EXT2_COMPR_FL;
@@ -47,12 +46,13 @@ bitflags! {
     }
 }
 
-trait FileAttrs {
-    fn lsattr(&self) -> Result<Flags, nix::Error>;
+pub trait FileAttrs {
+    fn flags(&self) -> Result<Flags, nix::Error>;
+    fn setflags(&self, f: &Flags) -> Result<(), nix::Error>;
 }
 
 impl FileAttrs for Path {
-    fn lsattr(&self) -> Result<Flags, nix::Error> {
+    fn flags(&self) -> Result<Flags, nix::Error> {
         let path_cstr = CString::new(self.to_str().expect("Could not convert Path to str"))
             .expect("Could not convert str to CStr");
         let ret: i32;
@@ -66,15 +66,31 @@ impl FileAttrs for Path {
 
         match ret {
             0 => Ok(Flags::from_bits(retflags as u32)
-                    .expect("Failed to interpret return value as fileflag")
-                ),
-            _ => Err(nix::Error::last())
+                .expect("Failed to interpret return value as fileflag")),
+            _ => Err(nix::Error::last()),
+        }
+    }
+
+    fn setflags(&self, f: &Flags) -> Result<(), nix::Error> {
+        let path_cstr = CString::new(self.to_str().expect("Could not convert Path to str"))
+            .expect("Could not convert str to CStr");
+        let ret: i32;
+        let intflags: u64 = f.bits() as u64;
+        let path_ptr = path_cstr.as_ptr();
+
+        unsafe {
+            ret = fsetflags(path_ptr, intflags);
+        }
+
+        match ret {
+            0 => Ok(()),
+            _ => Err(nix::Error::last()),
         }
     }
 }
 
 impl FileAttrs for File {
-    fn lsattr(&self) -> Result<Flags, nix::Error> {
+    fn flags(&self) -> Result<Flags, nix::Error> {
         let ret: i32;
         let mut retflags: u64 = 0;
         let retflags_ptr: *mut u64 = &mut retflags;
@@ -85,15 +101,22 @@ impl FileAttrs for File {
 
         match ret {
             0 => Ok(Flags::from_bits(retflags as u32)
-                    .expect("Failed to interpret return value as fileflag")
-                ),
-            _ => Err(nix::Error::last())
+                .expect("Failed to interpret return value as fileflag")),
+            _ => Err(nix::Error::last()),
         }
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+    fn setflags(&self, f: &Flags) -> Result<(), nix::Error> {
+        let ret: i32;
+        let intflags: u64 = f.bits() as u64;
 
+        unsafe {
+            ret = setflags(self.as_raw_fd(), intflags);
+        }
+
+        match ret {
+            0 => Ok(()),
+            _ => Err(nix::Error::last()),
+        }
+    }
 }
