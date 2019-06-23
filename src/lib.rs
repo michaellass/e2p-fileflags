@@ -30,9 +30,9 @@ extern crate bitflags;
 extern crate serde;
 
 use e2p_sys::*;
-use nix;
 use std::ffi::CString;
 use std::fs::File;
+use std::io::{Error, ErrorKind};
 use std::os::unix::io::AsRawFd;
 use std::path::Path;
 
@@ -77,8 +77,8 @@ bitflags! {
 }
 
 pub trait FileFlags {
-    fn flags(&self) -> Result<Flags, nix::Error>;
-    fn set_flags(&self, f: impl AsRef<Flags>) -> Result<(), nix::Error>;
+    fn flags(&self) -> Result<Flags, Error>;
+    fn set_flags(&self, f: impl AsRef<Flags>) -> Result<(), Error>;
 }
 
 impl AsRef<Flags> for Flags {
@@ -88,9 +88,16 @@ impl AsRef<Flags> for Flags {
 }
 
 impl FileFlags for Path {
-    fn flags(&self) -> Result<Flags, nix::Error> {
-        let path_cstr = CString::new(self.to_str().expect("Could not convert Path to str"))
-            .expect("Could not convert str to CStr");
+    fn flags(&self) -> Result<Flags, Error> {
+        let path_cstr = match self.to_str() {
+            Some(s) => CString::new(s)?,
+            None => {
+                return Err(Error::new(
+                    ErrorKind::InvalidInput,
+                    "Provided path is no valid Unicode",
+                ));
+            }
+        };
         let ret: i32;
         let mut retflags: u64 = 0;
         let path_ptr = path_cstr.as_ptr();
@@ -101,15 +108,27 @@ impl FileFlags for Path {
         }
 
         match ret {
-            0 => Ok(Flags::from_bits(retflags as u32)
-                .expect("Failed to interpret return value as fileflag")),
-            _ => Err(nix::Error::last()),
+            0 => match Flags::from_bits(retflags as u32) {
+                Some(f) => Ok(f),
+                None => Err(Error::new(
+                    ErrorKind::InvalidData,
+                    "Unexcpected flags encountered",
+                )),
+            },
+            _ => Err(Error::last_os_error()),
         }
     }
 
-    fn set_flags(&self, f: impl AsRef<Flags>) -> Result<(), nix::Error> {
-        let path_cstr = CString::new(self.to_str().expect("Could not convert Path to str"))
-            .expect("Could not convert str to CStr");
+    fn set_flags(&self, f: impl AsRef<Flags>) -> Result<(), Error> {
+        let path_cstr = match self.to_str() {
+            Some(s) => CString::new(s)?,
+            None => {
+                return Err(Error::new(
+                    ErrorKind::InvalidInput,
+                    "Provided path is no valid Unicode",
+                ));
+            }
+        };
         let ret: i32;
         let intflags: u64 = f.as_ref().bits() as u64;
         let path_ptr = path_cstr.as_ptr();
@@ -120,13 +139,13 @@ impl FileFlags for Path {
 
         match ret {
             0 => Ok(()),
-            _ => Err(nix::Error::last()),
+            _ => Err(Error::last_os_error()),
         }
     }
 }
 
 impl FileFlags for File {
-    fn flags(&self) -> Result<Flags, nix::Error> {
+    fn flags(&self) -> Result<Flags, Error> {
         let ret: i32;
         let mut retflags: u64 = 0;
         let retflags_ptr: *mut u64 = &mut retflags;
@@ -136,13 +155,18 @@ impl FileFlags for File {
         }
 
         match ret {
-            0 => Ok(Flags::from_bits(retflags as u32)
-                .expect("Failed to interpret return value as fileflag")),
-            _ => Err(nix::Error::last()),
+            0 => match Flags::from_bits(retflags as u32) {
+                Some(f) => Ok(f),
+                None => Err(Error::new(
+                    ErrorKind::InvalidData,
+                    "Unexcpected flags encountered",
+                )),
+            },
+            _ => Err(Error::last_os_error()),
         }
     }
 
-    fn set_flags(&self, f: impl AsRef<Flags>) -> Result<(), nix::Error> {
+    fn set_flags(&self, f: impl AsRef<Flags>) -> Result<(), Error> {
         let ret: i32;
         let intflags: u64 = f.as_ref().bits() as u64;
 
@@ -152,7 +176,7 @@ impl FileFlags for File {
 
         match ret {
             0 => Ok(()),
-            _ => Err(nix::Error::last()),
+            _ => Err(Error::last_os_error()),
         }
     }
 }
@@ -165,9 +189,9 @@ mod tests {
 
     #[test]
     fn unified() {
-        let mut p = env::current_dir().expect("Could not determine current dir");
+        let mut p = env::current_dir().unwrap();
         p.push("fileflags-testfile-voo4JooY");
-        let f = File::create(&p).expect("Could not create testfile");
+        let f = File::create(&p).unwrap();
 
         assert_eq!(f.flags().unwrap(), Flags::empty());
         p.set_flags(Flags::NOCOW).unwrap();
