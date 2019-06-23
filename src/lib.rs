@@ -190,7 +190,7 @@ mod tests {
     #[test]
     fn unified() {
         let mut p = env::current_dir().unwrap();
-        p.push("fileflags-testfile-voo4JooY");
+        p.push("e2p-fileflags-testfile-voo4JooY");
         let f = File::create(&p).unwrap();
 
         assert_eq!(f.flags().unwrap(), Flags::empty());
