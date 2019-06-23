@@ -187,6 +187,9 @@ mod tests {
     use std::env;
     use std::fs::{remove_file, File};
 
+    /* This test is currently known to fail on filesystems different to ext4:
+     * XFS does not support the NOCOW flag
+     * F2FS implicitly sets the INLINE_DATA flag on the test file */
     #[test]
     fn unified() {
         let mut p = env::current_dir().unwrap();
