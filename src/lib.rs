@@ -200,8 +200,6 @@ mod tests {
     use std::env;
     use std::fs::{remove_file, File};
 
-    /* This test is currently known to fail on XFS as it does not
-     * support the NOCOW flag */
     #[test]
     fn unified() {
         let mut p = env::current_dir().unwrap();
@@ -211,23 +209,14 @@ mod tests {
         let initial = p.flags().unwrap();
         assert_eq!(initial, f.flags().unwrap());
 
-        p.set_flags(Flags::NOCOW | initial).unwrap();
-        assert_eq!(f.flags().unwrap(), Flags::NOCOW | initial);
-        p.set_flags(Flags::NOCOW | Flags::NOATIME | initial).unwrap();
-        assert_eq!(f.flags().unwrap(), Flags::NOATIME | Flags::NOCOW | initial);
-        p.set_flags(&(Flags::NOCOW | initial)).unwrap();
-        assert_eq!(f.flags().unwrap(), Flags::NOCOW | initial);
-        p.set_flags(initial).unwrap();
+        p.set_flags(Flags::NOATIME | initial).unwrap();
+        assert_eq!(f.flags().unwrap(), Flags::NOATIME | initial);
+        p.set_flags(&initial).unwrap();
         assert_eq!(f.flags().unwrap(), initial);
 
-        assert_eq!(p.flags().unwrap(), initial);
-        f.set_flags(Flags::NOCOW | initial).unwrap();
-        assert_eq!(p.flags().unwrap(), Flags::NOCOW | initial);
-        f.set_flags(Flags::NOCOW | Flags::NOATIME | initial).unwrap();
-        assert_eq!(p.flags().unwrap(), Flags::NOATIME | Flags::NOCOW | initial);
-        f.set_flags(&(Flags::NOCOW | initial)).unwrap();
-        assert_eq!(p.flags().unwrap(), Flags::NOCOW | initial);
-        f.set_flags(initial).unwrap();
+        f.set_flags(Flags::NOATIME | initial).unwrap();
+        assert_eq!(p.flags().unwrap(), Flags::NOATIME | initial);
+        f.set_flags(&initial).unwrap();
         assert_eq!(p.flags().unwrap(), initial);
 
         drop(f);
