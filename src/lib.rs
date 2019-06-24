@@ -51,7 +51,10 @@ bitflags! {
         const DIRTY = EXT2_DIRTY_FL;
         const COMPRBLK = EXT2_COMPRBLK_FL;
         const NOCOMPR = EXT2_NOCOMPR_FL;
+
+        #[cfg(ENCRYPT)]
         const ENCRYPT = EXT4_ENCRYPT_FL;
+
         const BTREE = EXT2_BTREE_FL;
         const INDEX = EXT2_INDEX_FL;
         const IMAGIC = EXT2_IMAGIC_FL;
@@ -61,15 +64,25 @@ bitflags! {
         const TOPDIR = EXT2_TOPDIR_FL;
         const HUGE_FILE = EXT4_HUGE_FILE_FL;
         const EXTENTS = EXT4_EXTENTS_FL;
+
+        #[cfg(VERITY)]
         const VERITY = EXT4_VERITY_FL;
+
         const EA_INODE = EXT4_EA_INODE_FL;
         const NOCOW = FS_NOCOW_FL;
         const SNAPFILE = EXT4_SNAPFILE_FL;
         const SNAPFILE_DELETED = EXT4_SNAPFILE_DELETED_FL;
         const SNAPFILE_SHRUNK = EXT4_SNAPFILE_SHRUNK_FL;
+
+        #[cfg(INLINE_DATA)]
         const INLINE_DATA = EXT4_INLINE_DATA_FL;
+
+        #[cfg(PROJINHERIT)]
         const PROJINHERIT = EXT4_PROJINHERIT_FL;
+
+        #[cfg(CASEFOLD)]
         const CASEFOLD = EXT4_CASEFOLD_FL;
+
         const RESERVED = EXT2_RESERVED_FL;
         const USER_VISIBLE = EXT2_FL_USER_VISIBLE;
         const USER_MODIFIABLE = EXT2_FL_USER_MODIFIABLE;
