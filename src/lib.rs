@@ -200,34 +200,35 @@ mod tests {
     use std::env;
     use std::fs::{remove_file, File};
 
-    /* This test is currently known to fail on filesystems different to ext4:
-     * XFS does not support the NOCOW flag
-     * F2FS implicitly sets the INLINE_DATA flag on the test file */
+    /* This test is currently known to fail on XFS as it does not
+     * support the NOCOW flag */
     #[test]
     fn unified() {
         let mut p = env::current_dir().unwrap();
         p.push("e2p-fileflags-testfile-voo4JooY");
         let f = File::create(&p).unwrap();
 
-        assert_eq!(f.flags().unwrap(), Flags::empty());
-        p.set_flags(Flags::NOCOW).unwrap();
-        assert_eq!(f.flags().unwrap(), Flags::NOCOW);
-        p.set_flags(Flags::NOCOW | Flags::NOATIME).unwrap();
-        assert_eq!(f.flags().unwrap(), Flags::NOATIME | Flags::NOCOW);
-        p.set_flags(&Flags::NOCOW).unwrap();
-        assert_eq!(f.flags().unwrap(), Flags::NOCOW);
-        p.set_flags(&Flags::empty()).unwrap();
-        assert_eq!(f.flags().unwrap(), Flags::empty());
+        let initial = p.flags().unwrap();
+        assert_eq!(initial, f.flags().unwrap());
 
-        assert_eq!(p.flags().unwrap(), Flags::empty());
-        f.set_flags(Flags::NOCOW).unwrap();
-        assert_eq!(p.flags().unwrap(), Flags::NOCOW);
-        f.set_flags(Flags::NOCOW | Flags::NOATIME).unwrap();
-        assert_eq!(p.flags().unwrap(), Flags::NOATIME | Flags::NOCOW);
-        f.set_flags(&Flags::NOCOW).unwrap();
-        assert_eq!(p.flags().unwrap(), Flags::NOCOW);
-        f.set_flags(&Flags::empty()).unwrap();
-        assert_eq!(p.flags().unwrap(), Flags::empty());
+        p.set_flags(Flags::NOCOW | initial).unwrap();
+        assert_eq!(f.flags().unwrap(), Flags::NOCOW | initial);
+        p.set_flags(Flags::NOCOW | Flags::NOATIME | initial).unwrap();
+        assert_eq!(f.flags().unwrap(), Flags::NOATIME | Flags::NOCOW | initial);
+        p.set_flags(&(Flags::NOCOW | initial)).unwrap();
+        assert_eq!(f.flags().unwrap(), Flags::NOCOW | initial);
+        p.set_flags(initial).unwrap();
+        assert_eq!(f.flags().unwrap(), initial);
+
+        assert_eq!(p.flags().unwrap(), initial);
+        f.set_flags(Flags::NOCOW | initial).unwrap();
+        assert_eq!(p.flags().unwrap(), Flags::NOCOW | initial);
+        f.set_flags(Flags::NOCOW | Flags::NOATIME | initial).unwrap();
+        assert_eq!(p.flags().unwrap(), Flags::NOATIME | Flags::NOCOW | initial);
+        f.set_flags(&(Flags::NOCOW | initial)).unwrap();
+        assert_eq!(p.flags().unwrap(), Flags::NOCOW | initial);
+        f.set_flags(initial).unwrap();
+        assert_eq!(p.flags().unwrap(), initial);
 
         drop(f);
         let _ = remove_file(p);
