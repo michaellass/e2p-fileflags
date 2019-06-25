@@ -95,8 +95,9 @@ pub trait FileFlags {
 }
 
 impl AsRef<Flags> for Flags {
+    #[inline]
     fn as_ref(&self) -> &Flags {
-        &self
+        self
     }
 }
 
