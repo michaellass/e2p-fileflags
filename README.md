@@ -1,22 +1,22 @@
-# e2p-fileflags:
+# e2p-fileflags: Read and set ext2/ext3/ext4/btrfs/xfs/f2fs file flags like with lsattr and chattr from e2fsprogs
 
-[![Build Status](https://travis-ci.com/michaellass/e2p-fileflags.svg?branch=master)](https://travis-ci.com/michaellass/e2p-fileflags)
-[![License: MIT](https://img.shields.io/crates/l/e2p-fileflags.svg](https://github.com/michaellass/e2p-fileflags/blob/master/LICENSE)
-[![Version](https://img.shields.io/crates/v/e2p-fileflags.svg](https://crates.io/crates/e2p-fileflags)
+[![build](https://travis-ci.com/michaellass/e2p-fileflags.svg?branch=master)](https://travis-ci.com/michaellass/e2p-fileflags)
+[![license](https://img.shields.io/github/license/michaellass/e2p-fileflags.svg)](https://github.com/michaellass/e2p-fileflags/blob/master/LICENSE)
+[![crates.io](https://img.shields.io/crates/v/e2p-fileflags.svg)](https://crates.io/crates/e2p-fileflags)
 
 e2p-fileflags provides access to file flags on Linux. Which flags exist,
 depends on the file system used. This crate uses libe2p in the background,
 which originates from e2fsprogs and supports flags for ext2, ext3, ext4,
-xfs, f2fs and btrfs file systems.
+btrfs, xfs and f2fs file systems.
 
 ## Examples
 ```rust
 use std::fs::File;
 use e2p_fileflags::{FileFlags,Flags};
 
-let f = File::create("./foo/bar.txt").unwrap();
-f.set_flags(Flags::NOCOW).unwrap();
-println!("Flags: {:?}", f.flags());
+let f = File::create("./foo/bar.txt")?;
+f.set_flags(Flags::NOCOW)?;
+println!("Flags: {:?}", f.flags()?);
 ```
 
 ```rust
@@ -24,8 +24,8 @@ use std::path::Path;
 use e2p_fileflags::{FileFlags,Flags};
 
 let p = Path::new("./foo/bar.txt");
-p.set_flags(Flags::NOCOW).unwrap();
-println!("Flags: {:?}", p.flags());
+p.set_flags(Flags::NOCOW)?;
+println!("Flags: {:?}", p.flags()?);
 ```
 
 ## Requirements
