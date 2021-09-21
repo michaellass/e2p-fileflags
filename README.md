@@ -1,6 +1,6 @@
 # e2p-fileflags: Read and set ext2/ext3/ext4/btrfs/xfs/f2fs file flags like with lsattr and chattr from e2fsprogs
 
-[![build](https://travis-ci.com/michaellass/e2p-fileflags.svg?branch=master)](https://travis-ci.com/michaellass/e2p-fileflags)
+[![CI](https://github.com/michaellass/e2p-fileflags/actions/workflows/ci.yml/badge.svg)](https://github.com/michaellass/e2p-fileflags/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/michaellass/e2p-fileflags.svg)](https://github.com/michaellass/e2p-fileflags/blob/master/LICENSE)
 [![crates.io](https://img.shields.io/crates/v/e2p-fileflags.svg)](https://crates.io/crates/e2p-fileflags)
 
