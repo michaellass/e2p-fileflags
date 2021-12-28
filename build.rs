@@ -17,8 +17,13 @@ fn main() {
         println!("cargo:rustc-cfg=VERITY");
     }
 
-    // Introduced in v1.45
+    // Introduced in v1.45.0
     if constants.iter().any(|&s| s == "EXT4_CASEFOLD_FL") {
         println!("cargo:rustc-cfg=CASEFOLD");
+    }
+
+    // Introduced in v1.45.7
+    if constants.iter().any(|&s| s == "FS_DAX_FL") {
+        println!("cargo:rustc-cfg=DAX");
     }
 }

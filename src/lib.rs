@@ -71,6 +71,10 @@ bitflags! {
         const EA_INODE = EXT4_EA_INODE_FL;
         const NOCOW = FS_NOCOW_FL;
         const SNAPFILE = EXT4_SNAPFILE_FL;
+
+        #[cfg(DAX)]
+        const DAX = FS_DAX_FL;
+
         const SNAPFILE_DELETED = EXT4_SNAPFILE_DELETED_FL;
         const SNAPFILE_SHRUNK = EXT4_SNAPFILE_SHRUNK_FL;
 
