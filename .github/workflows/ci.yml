@@ -63,3 +63,20 @@ jobs:
       run: cargo build --verbose --target x86_64-unknown-linux-gnu
     - name: Test
       run: cargo test --verbose --target x86_64-unknown-linux-gnu
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        override: true
+        components: clippy
+    - name: Install e2fslibs
+      run: |
+        sudo apt update
+        sudo apt install -y e2fslibs e2fslibs-dev
+    - name: Lint
+      run: cargo clippy --all-targets --all-features -- -D warnings
