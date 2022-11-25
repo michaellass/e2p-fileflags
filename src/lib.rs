@@ -95,15 +95,9 @@ bitflags! {
 
 pub trait FileFlags {
     fn flags(&self) -> Result<Flags, Error>;
-    fn set_flags(&self, f: impl AsRef<Flags>) -> Result<(), Error>;
+    fn set_flags(&self, f: Flags) -> Result<(), Error>;
 }
 
-impl AsRef<Flags> for Flags {
-    #[inline]
-    fn as_ref(&self) -> &Flags {
-        self
-    }
-}
 
 impl FileFlags for Path {
     fn flags(&self) -> Result<Flags, Error> {
@@ -137,7 +131,7 @@ impl FileFlags for Path {
         }
     }
 
-    fn set_flags(&self, f: impl AsRef<Flags>) -> Result<(), Error> {
+    fn set_flags(&self, f: Flags) -> Result<(), Error> {
         let path_cstr = match self.to_str() {
             Some(s) => CString::new(s)?,
             None => {
@@ -148,7 +142,7 @@ impl FileFlags for Path {
             }
         };
         let ret: i32;
-        let intflags: u64 = f.as_ref().bits() as u64;
+        let intflags: u64 = f.bits() as u64;
         let path_ptr = path_cstr.as_ptr();
 
         unsafe {
@@ -184,9 +178,9 @@ impl FileFlags for File {
         }
     }
 
-    fn set_flags(&self, f: impl AsRef<Flags>) -> Result<(), Error> {
+    fn set_flags(&self, f: Flags) -> Result<(), Error> {
         let ret: i32;
-        let intflags: u64 = f.as_ref().bits() as u64;
+        let intflags: u64 = f.bits() as u64;
 
         unsafe {
             ret = setflags(self.as_raw_fd(), intflags);
