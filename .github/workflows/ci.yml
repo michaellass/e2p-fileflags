@@ -13,12 +13,8 @@ jobs:
   stable:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@stable
     - name: Install e2fslibs
       run: |
         sudo apt update
@@ -31,12 +27,8 @@ jobs:
   beta:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: beta
-        override: true
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@beta
     - name: Install e2fslibs
       run: |
         sudo apt update
@@ -49,12 +41,8 @@ jobs:
   nightly:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        override: true
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@nightly
     - name: Install e2fslibs
       run: |
         sudo apt update
@@ -67,12 +55,9 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install rust
-      uses: actions-rs/toolchain@v1
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@nightly
       with:
-        toolchain: nightly
-        override: true
         components: clippy
     - name: Install e2fslibs
       run: |
