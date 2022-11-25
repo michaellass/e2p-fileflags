@@ -216,12 +216,12 @@ mod tests {
 
         p.set_flags(Flags::NOATIME | initial).unwrap();
         assert_eq!(f.flags().unwrap(), Flags::NOATIME | initial);
-        p.set_flags(&initial).unwrap();
+        p.set_flags(initial).unwrap();
         assert_eq!(f.flags().unwrap(), initial);
 
         f.set_flags(Flags::NOATIME | initial).unwrap();
         assert_eq!(p.flags().unwrap(), Flags::NOATIME | initial);
-        f.set_flags(&initial).unwrap();
+        f.set_flags(initial).unwrap();
         assert_eq!(p.flags().unwrap(), initial);
 
         drop(f);
