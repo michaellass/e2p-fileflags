@@ -38,7 +38,7 @@ use std::path::Path;
 
 bitflags! {
     #[derive(Copy, Clone, Debug, Default, Eq, Hash, PartialEq)]
-    #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+    #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
     pub struct Flags: u32 {
         const SECRM = EXT2_SECRM_FL;
         const UNRM = EXT2_UNRM_FL;
