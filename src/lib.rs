@@ -37,7 +37,7 @@ use std::os::unix::io::AsRawFd;
 use std::path::Path;
 
 bitflags! {
-    #[derive(Default)]
+    #[derive(Copy, Clone, Debug, Default, Eq, Hash, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
     pub struct Flags: u32 {
         const SECRM = EXT2_SECRM_FL;
