@@ -3,6 +3,7 @@
 [![CI](https://github.com/michaellass/e2p-fileflags/actions/workflows/ci.yml/badge.svg)](https://github.com/michaellass/e2p-fileflags/actions/workflows/ci.yml)
 [![license](https://img.shields.io/github/license/michaellass/e2p-fileflags.svg)](https://github.com/michaellass/e2p-fileflags/blob/master/LICENSE)
 [![crates.io](https://img.shields.io/crates/v/e2p-fileflags.svg)](https://crates.io/crates/e2p-fileflags)
+[![docs.rs](https://docs.rs/e2p-fileflags/badge.svg)](https://docs.rs/e2p-fileflags)
 
 e2p-fileflags provides access to file flags on Linux. Which flags exist,
 depends on the file system used. This crate uses libe2p in the background,
@@ -36,6 +37,7 @@ println!("Flags: {:?}", p.flags()?);
   Linux distributions typically packages those under one of the following names:
   * e2fsprogs(-dev)
   * e2fslibs(-dev)
+  * libext2fs(-dev)
+* libclang is required for building the e2p-sys dependency. This is sometimes packaged as libclang1.
 
-  Note that after an update of libe2p, you may need to rebuild libe2p-sys and
-  this crate to get access to any newly introduced flags.
+Note that after an update of libe2p, you may need to rebuild e2p-sys and this crate to get access to any newly introduced flags.

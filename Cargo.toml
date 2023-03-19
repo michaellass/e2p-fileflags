@@ -8,13 +8,10 @@ homepage = "https://github.com/michaellass/e2p-fileflags/"
 keywords = ["e2fsprogs", "e2fslibs", "lsattr", "chattr", "ext"]
 license = "MIT"
 name = "e2p-fileflags"
-publish = false
+publish = ["crates-io"]
 readme = "README.md"
 repository = "https://github.com/michaellass/e2p-fileflags.git"
 version = "0.1.0"
-
-[badges]
-travis-ci = { repository = "michaellass/e2p-fileflags", branch = "master" }
 
 [build-dependencies]
 e2p-sys = { version= "0.1.0" }

@@ -22,6 +22,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#![warn(rust_2018_idioms)]
+
+//! Read and set ext2/ext3/ext4/btrfs/xfs/f2fs file flags like with lsattr and chattr from e2fsprogs
+//!
+//! e2p-fileflags provides access to ext* file flags. This provides similar functionality as to the
+//! lsattr and chattr command line tools on Linux. Which flags exist, depends on the file system used.
+//! This crate uses libe2p in the background, which originates from e2fsprogs and supports flags for
+//! ext2, ext3, ext4, btrfs, xfs and f2fs file systems.
+//!
+//! # Example
+//! ```rust
+//! use std::fs::{remove_file,File};
+//! use std::path::Path;
+//! use e2p_fileflags::{FileFlags,Flags};
+//!
+//! let f = File::create("./fileflags_testfile.txt").expect("Could not create testfile");
+//! f.set_flags(Flags::NOCOW).expect("Could not set flags");
+//! println!("New flags: {:?}", f.flags().expect("Could not read flags"));
+//!
+//! let p = Path::new("./fileflags_testfile.txt");
+//! p.set_flags(Flags::NOCOW | Flags::NOATIME).expect("Could not set flags");
+//! println!("New flags: {:?}", p.flags().expect("Could not read flags"));
+//!
+//! drop(f);
+//! let _ = remove_file(p);
+//! ```
+
 #[macro_use]
 extern crate bitflags;
 
@@ -37,6 +64,7 @@ use std::os::unix::io::AsRawFd;
 use std::path::Path;
 
 bitflags! {
+    /// Bitflags struct representing one or multiple file flags
     #[derive(Copy, Clone, Debug, Default, Eq, Hash, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
     pub struct Flags: u32 {
@@ -93,8 +121,13 @@ bitflags! {
     }
 }
 
+/// Reading and setting of file flags.
 pub trait FileFlags {
+    /// Determine currently set file flags.
     fn flags(&self) -> Result<Flags, Error>;
+
+    /// Set file flags. This will update all user-writable flags according to f, i.e.,
+    /// flags set in f will be set, flags not set in f will be unset.
     fn set_flags(&self, f: Flags) -> Result<(), Error>;
 }
 
