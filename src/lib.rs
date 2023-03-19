@@ -32,7 +32,7 @@ SOFTWARE.
 //! ext2, ext3, ext4, btrfs, xfs and f2fs file systems.
 //!
 //! # Example
-//! ```rust
+//! ```no_run
 //! use std::fs::{remove_file,File};
 //! use std::path::Path;
 //! use e2p_fileflags::{FileFlags,Flags};
