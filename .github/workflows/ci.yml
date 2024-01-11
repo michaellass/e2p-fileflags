@@ -17,6 +17,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
     - name: Install e2fslibs
       run: |
+        sudo echo "Hello universe!"
         sudo apt update
         sudo apt install -y e2fslibs e2fslibs-dev
     - name: Build
