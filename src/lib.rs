@@ -139,7 +139,6 @@ pub trait FileFlags {
     fn set_flags(&self, f: Flags) -> Result<(), Error>;
 }
 
-
 impl FileFlags for Path {
     fn flags(&self) -> Result<Flags, Error> {
         let path_cstr = match self.to_str() {
@@ -238,7 +237,7 @@ impl FileFlags for File {
 mod tests {
     use super::*;
     use std::env;
-    use std::fs::{remove_file, File};
+    use std::fs::{File, remove_file};
 
     #[test]
     fn unified() {
