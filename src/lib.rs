@@ -22,7 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#![warn(rust_2018_idioms)]
+#![deny(warnings)]
+#![deny(deprecated_safe)]
+#![deny(future_incompatible)]
+#![deny(keyword_idents)]
+#![deny(let_underscore)]
+#![deny(nonstandard_style)]
+#![deny(refining_impl_trait)]
+#![deny(rust_2018_idioms)]
+#![deny(unused)]
 
 //! Read and set ext2/ext3/ext4/btrfs/xfs/f2fs file flags like with lsattr and chattr from e2fsprogs
 //!
@@ -252,6 +260,6 @@ mod tests {
         assert_eq!(p.flags().unwrap(), initial);
 
         drop(f);
-        let _ = remove_file(p);
+        drop(remove_file(p));
     }
 }
