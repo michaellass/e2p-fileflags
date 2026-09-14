@@ -11,7 +11,7 @@ name = "e2p-fileflags"
 publish = ["crates-io"]
 readme = "README.md"
 repository = "https://github.com/michaellass/e2p-fileflags.git"
-version = "0.1.0"
+version = "0.1.1"
 
 [build-dependencies]
 e2p-sys = { version= "0.2.0" }
