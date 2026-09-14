@@ -14,11 +14,11 @@ repository = "https://github.com/michaellass/e2p-fileflags.git"
 version = "0.1.0"
 
 [build-dependencies]
-e2p-sys = { version= "0.1.0" }
+e2p-sys = { version= "0.2.0" }
 
 [dependencies]
 bitflags = "2.0.0"
-e2p-sys = { version= "0.1.0" }
+e2p-sys = { version= "0.2.0" }
 serde = { version = "1.0.115", optional = true, features = ["derive"] }
 
 [features]
